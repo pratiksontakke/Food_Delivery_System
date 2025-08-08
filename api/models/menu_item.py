@@ -1,12 +1,13 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import String, Text, Float, Boolean, Integer, DateTime, func, ForeignKey, DECIMAL
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, List
 from datetime import datetime
 from decimal import Decimal
 from api.db.database import Base
 
 if TYPE_CHECKING:
     from .restaurant import Restaurant
+    from .order_item import OrderItem
 
 class MenuItem(Base):
     __tablename__ = "menu_items"
@@ -28,5 +29,6 @@ class MenuItem(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
     
-    # Relationship
+    # Relationships
     restaurant: Mapped["Restaurant"] = relationship("Restaurant", back_populates="menu_items")
+    order_items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="menu_item")

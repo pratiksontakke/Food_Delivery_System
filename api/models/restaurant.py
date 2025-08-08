@@ -6,6 +6,8 @@ from api.db.database import Base
 
 if TYPE_CHECKING:
     from .menu_item import MenuItem
+    from .order import Order
+    from .review import Review
 
 class Restaurant(Base):
     __tablename__ = "restaurants"
@@ -27,9 +29,11 @@ class Restaurant(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
     
-    # Relationship
+    # Relationships
     menu_items: Mapped[List["MenuItem"]] = relationship(
         "MenuItem", 
         back_populates="restaurant", 
         cascade="all, delete-orphan"
     )
+    orders: Mapped[List["Order"]] = relationship("Order", back_populates="restaurant")
+    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="restaurant", cascade="all, delete-orphan")
