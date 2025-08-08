@@ -1,6 +1,10 @@
 from datetime import time, datetime
-from typing import Optional
+from typing import Optional, List, ForwardRef
 from pydantic import BaseModel, Field, constr
+from decimal import Decimal
+
+# Forward reference to avoid circular imports
+MenuItemRead = ForwardRef('MenuItemRead')
 
 class RestaurantBase(BaseModel):
     name: constr(min_length=3, max_length=100)
@@ -31,24 +35,15 @@ class RestaurantRead(RestaurantBase):
     id: int
     created_at: datetime
     updated_at: datetime
-
+    
     model_config = {
         "from_attributes": True
     }
 
+class RestaurantWithMenu(RestaurantRead):
+    menu_items: List['MenuItemRead'] = []
+    average_price: Optional[Decimal] = None
 
-
-
-# Notes: 
-# **One-line difference:**
-
-# * **`constr()`** creates a **new custom string type** with built-in validation rules.
-# * **`Field()`** applies **validation and metadata to a specific field** without changing its type.
-
-# **When to use:**
-
-# * **Use `constr()`** when you need a **reusable, strongly-typed constrained string** across multiple models.
-# * **Use `Field()`** when the **rules are specific to one field** or you also want to add docs/metadata in the same place.
-
-# orm_mode = True allows FastAPI to convert SQLAlchemy objects directly into JSON responses.
-
+# Import after class definitions to resolve forward references
+from api.schemas.menu_item import MenuItemRead
+RestaurantWithMenu.model_rebuild()

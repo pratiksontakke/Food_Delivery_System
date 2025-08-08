@@ -1,8 +1,11 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import String, Text, Float, Boolean, Time, DateTime, func
-from typing import Optional
+from typing import Optional, List, TYPE_CHECKING
 from datetime import time, datetime
 from api.db.database import Base
+
+if TYPE_CHECKING:
+    from .menu_item import MenuItem
 
 class Restaurant(Base):
     __tablename__ = "restaurants"
@@ -22,4 +25,11 @@ class Restaurant(Base):
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+    
+    # Relationship
+    menu_items: Mapped[List["MenuItem"]] = relationship(
+        "MenuItem", 
+        back_populates="restaurant", 
+        cascade="all, delete-orphan"
     )
